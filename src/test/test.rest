@@ -1,0 +1,32 @@
+GET http://localhost:8080/ciudades
+
+###
+
+GET http://localhost:8080/ciudad/1
+
+###
+
+GET http://localhost:8080/aeropuertos
+
+###
+
+GET http://localhost:8080/aeropuerto/1
+
+###
+
+POST http://localhost:8080/ciudades
+Content-Type: application/json
+
+{
+    "nombre": "Valencia"
+}
+
+###
+
+POST http://localhost:8080/aeropuertos
+Content-Type: application/json
+
+{
+    "nombre": "Manises",
+    "id_ciudad": 1
+}

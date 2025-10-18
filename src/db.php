@@ -9,10 +9,10 @@ class Database {
     public $pdo = null;
 
     public function __construct() {
-        $this->host =   $_ENV['DB_HOST'];
-        $this->db =     $_ENV['DB_NAME'];
-        $this->user =   $_ENV['DB_USER'];
-        $this->pass =   $_ENV['DB_PASS'];
+        $this->host =   getenv('MYSQL_HOST');
+        $this->db =     getenv('MYSQL_DATABASE');
+        $this->user =   getenv('MYSQL_USER');
+        $this->pass =   getenv('MYSQL_PASSWORD');
     }
 
     public function connect() {
