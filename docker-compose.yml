@@ -11,7 +11,9 @@ services:
       - MYSQL_HOST=mysql # nombre del servicio mysql en docker-compose
       - MYSQL_USER=alumno
       - MYSQL_PASSWORD=alumno
-      - MYSQL_DB=aeropuerto
+      - MYSQL_DATABASE=aeropuerto
+    depends_on:
+      - mysql
 
   nginx:
     image: nginx:latest
@@ -20,14 +22,13 @@ services:
       - "8080:80"
     volumes:
       - ./public:/var/www/html
-      - ./src:/var/www/src
       - ./src/logs:/var/www/src/logs
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
 
   mysql:
-    image: mysql:8
+    image: mysql:latest
     container_name: aeropuerto_mysql
     environment:
       MYSQL_ROOT_PASSWORD: administrador
@@ -35,6 +36,7 @@ services:
       MYSQL_PASSWORD: alumno
       MYSQL_DATABASE: aeropuerto
     volumes:
+      - ./src/db.sql:/docker-entrypoint-initdb.d/init.sql
       - ./mysql/data:/var/lib/mysql
       # - ./mysql/tmp:/tmp
     ports:
