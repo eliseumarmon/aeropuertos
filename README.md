@@ -8,7 +8,7 @@ Este proyecto tiene como objetivo crear una aplicación RESTful utilizando **Sli
 ### **Fase 1: Creación de la API con Persistencia**
 
 **Objetivo:**
-En esta primera fase, se creará una API RESTful básica que permita a los usuarios consultar información sobre ciudades y sus aeropuertos. Los datos serán almacenados de manera estática en un archivo **JSON**.
+En esta primera fase, se creará una API RESTful básica que permita a los usuarios consultar información sobre ciudades y sus aeropuertos. Los datos serán almacenados de manera estática en una base de datos con **MySQL**.
 
 **Tareas:**
 
@@ -16,7 +16,7 @@ En esta primera fase, se creará una API RESTful básica que permita a los usuar
 
    * **Ciudades**: nombre de la ciudad, país, etc.
    * **Aeropuertos**: nombre del aeropuerto, ciudad a la que pertenece, etc.
-   * Relación entre ciudades y aeropuertos (un aeropuerto puede estar asociado a varias ciudades o una sola ciudad).
+   * Relación entre ciudades y aeropuertos (Una ciudad puede tener varios aeropuertos).
 
 2. **Desarrollo de la API:**
 
@@ -29,7 +29,7 @@ En esta primera fase, se creará una API RESTful básica que permita a los usuar
 
 3. **Persistencia de Datos:**
 
-   * Los datos estarán guardados en la base de datos llamada **aeropuertos**, siguiendo la estructura de datos proporcionada en el punto 1.
+   * Los datos estarán guardados en la base de datos llamada **aeropuerto**, siguiendo la estructura de datos proporcionada en el punto 1.
 
 4. **Tecnologías a Usar:**
 
