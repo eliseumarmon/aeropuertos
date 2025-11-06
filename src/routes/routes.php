@@ -5,10 +5,15 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 global $pdo;
 
+function json_un_encode(mixed $value): string|false {
+    $flags = JSON_UNESCAPED_UNICODE;
+    return json_encode($value, $flags);
+}
+
 $app->get('/ciudades', function (Request $req, Response $res) use ($pdo) {
     $stmt = $pdo->query("SELECT * FROM ciudades;");
     $ciudades = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $res->getBody()->write(json_encode($ciudades));
+    $res->getBody()->write(json_un_encode($ciudades));
     return $res->withHeader('Content-Type', 'application/json');
 });
 
@@ -18,7 +23,7 @@ $app->get('/ciudad/{id}', function (Request $req, Response $res, array $args) us
     $stmt = $pdo->prepare("SELECT * FROM ciudades WHERE id_ciudad = ?;");
     $stmt->execute([$id]);
     $ciudad = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $res->getBody()->write(json_encode($ciudad));
+    $res->getBody()->write(json_un_encode($ciudad));
     return $res->withHeader("Content-Type", "application/json");
 });
 
@@ -27,7 +32,7 @@ $app->get('/ciudad/{id}', function (Request $req, Response $res, array $args) us
 $app->get('/aeropuertos', function(Request $req, Response $res) use ($pdo) {
     $stmt = $pdo->query("SELECT id_aeropuerto, a.nombre AS aeropuerto, c.nombre AS ciudad FROM aeropuertos a, ciudades c WHERE a.id_ciudad = c.id_ciudad;");
     $aeropuertos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $res->getBody()->write(json_encode($aeropuertos));
+    $res->getBody()->write(json_un_encode($aeropuertos));
     return $res->withHeader("Content-Type", "application/json");
 });
 
@@ -36,12 +41,45 @@ $app->get('/aeropuerto/{id}', function (Request $req, Response $res, array $args
     $stmt = $pdo->prepare("SELECT id_aeropuerto, a.nombre AS aeropuerto, c.nombre AS ciudad FROM aeropuertos a, ciudades c WHERE id_aeropuerto = ? AND a.id_ciudad = c.id_ciudad;");
     $stmt->execute([$id]);
     $ciudad = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $res->getBody()->write(json_encode($ciudad));
+    $res->getBody()->write(json_un_encode($ciudad));
     return $res->withHeader("Content-Type", "application/json");
 });
 
+$app->get('/aeropuerto/{id}/conexiones', function (Request $req, Response $res, array $args) use ($pdo) {
+    $id = $args["id"];
+    $stmt = $pdo->prepare("SELECT id_origen, a.nombre AS Origen, id_destino, b.nombre as Destino FROM conexiones, aeropuertos a, aeropuertos b WHERE id_origen = ? AND id_origen = a.id_aeropuerto AND id_destino = b.id_aeropuerto;");
+    $stmt->execute([$id]);
+    $ciudad = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $res->getBody()->write(json_un_encode($ciudad));
+    return $res->withHeader("Content-Type", "application/json");
+});
 
-$app->post('/ciudades', function (Request $req, Response $res) use($pdo){
+$app->get("/conexiones", function(Request $req, Response $res) use($pdo) {
+    $stmt = $pdo->query("SELECT id_origen, a.nombre AS Origen, id_destino, b.nombre as Destino FROM conexiones, aeropuertos a, aeropuertos b WHERE id_origen = a.id_aeropuerto AND id_destino = b.id_aeropuerto ORDER BY id_origen;");
+    $conexiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $res->getBody()->write(json_un_encode($conexiones));
+    return $res->withHeader("Content-Type", "application/json");
+});
+
+$app->get("/conexiones/{from}/{to}", function(Request $req, Response $res, array $args) use($pdo) {
+    $from = $args["from"];
+    $to = $args["to"];
+    $stmt = $pdo->prepare("SELECT id_origen, a.nombre AS Origen, id_destino, b.nombre as Destino FROM conexiones, aeropuertos a, aeropuertos b WHERE id_origen = a.id_aeropuerto AND id_destino = b.id_aeropuerto AND id_origen = ? AND id_destino = ?;");
+    $stmt->execute([$from, $to]);
+
+    $conexiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $numero_conexiones = count($conexiones);
+    if ($numero_conexiones) {
+        $res->getBody()->write(json_un_encode($conexiones));
+        return $res->withHeader("Content-Type", "application/json");
+    }
+    else {
+    $res->getBody()->write(json_un_encode(["error" => "Conexión directa no encontrada."]));
+        return $res->withStatus(404)->withHeader("Content-Type", "application/json");
+    }
+});
+
+$app->post('/ciudades', function (Request $req, Response $res) use ($pdo) {
     $data = json_decode($req->getBody(), true);
     $nombre = $data["nombre"];
 
@@ -53,7 +91,7 @@ $app->post('/ciudades', function (Request $req, Response $res) use($pdo){
         'nombre' => $nombre
     ];
 
-    $res->getBody()->write(json_encode($result));
+    $res->getBody()->write(json_un_encode($result));
     return $res->withHeader("Content-Type", "application/json");
 });
 
@@ -71,6 +109,6 @@ $app->post('/aeropuertos', function (Request $req, Response $res) use ($pdo)  {
         'id_ciudad' => $ciudad
     ];
 
-    $res->getBody()->write(json_encode($result));
+    $res->getBody()->write(json_un_encode($result));
     return $res->withHeader("Content-Type", "application/json");
 });

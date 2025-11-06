@@ -1,3 +1,5 @@
+SET CHARACTER SET utf8mb4;
+
 DROP DATABASE IF EXISTS aeropuerto;
 
 CREATE DATABASE IF NOT EXISTS aeropuerto;
@@ -15,6 +17,7 @@ CREATE TABLE aeropuertos (
     id_ciudad INT NOT NULL,
     CONSTRAINT fk_aeropuertos_ciudades
         FOREIGN KEY (id_ciudad) REFERENCES ciudades(id_ciudad)
+        ON DELETE RESTRICT
 );
 
 CREATE TABLE conexiones (
@@ -22,9 +25,11 @@ CREATE TABLE conexiones (
     id_destino INT NOT NULL,
     PRIMARY KEY (id_origen, id_destino),
     CONSTRAINT fk_conexiones_aeropuertos_origen
-        FOREIGN KEY (id_origen) REFERENCES aeropuertos(id_aeropuerto),
+        FOREIGN KEY (id_origen) REFERENCES aeropuertos(id_aeropuerto)
+        ON DELETE RESTRICT,
     CONSTRAINT fk_conexiones_aeropuertos_destino
-        FOREIGN KEY (id_destino) REFERENCES aeropuertos(id_aeropuerto),
+        FOREIGN KEY (id_destino) REFERENCES aeropuertos(id_aeropuerto)
+        ON DELETE RESTRICT,
     CONSTRAINT CHK_aeropuertos
         CHECK (id_origen != id_destino)
 );

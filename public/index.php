@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/../src/vendor/autoload.php';
-require './../src/db.php';
+require './../src/db/db.php';
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;

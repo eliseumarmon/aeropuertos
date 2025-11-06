@@ -92,3 +92,51 @@ Añadir la capacidad para que la API pueda identificar rutas entre dos ciudades 
 
    * **PHP** con **Slim**.
    * **Persistencia**: MySQL
+
+### **Fase 4: Manipulación de Datos (CRUD)**
+
+**Objetivo:**
+En esta fase, se permitirá la creación, actualización y eliminación de aeropuertos y rutas (conexiones entre aeropuertos) mediante operaciones CRUD (Crear, Leer, Actualizar, Eliminar). Se implementarán las restricciones necesarias, como no poder eliminar un aeropuerto que tenga rutas asociadas. Para eliminar un aeropuerto, primero se deben eliminar sus rutas asociadas.
+
+**Tareas:**
+
+1. **Endpoints para CRUD de Aeropuertos:**
+
+   * `POST /airports`: Crear un nuevo aeropuerto.
+   * `PUT /airport/:id`: Actualizar los datos de un aeropuerto existente.
+   * `DELETE /airport/:id`: Eliminar un aeropuerto, previa eliminación de sus rutas asociadas.
+
+2. **Endpoints para CRUD de Rutas:**
+
+   * `POST /connections`: Crear una nueva conexión directa entre dos aeropuertos.
+   * `DELETE /connections/:id`: Eliminar una conexión entre aeropuertos.
+
+3. **Restricciones en la Eliminación de Aeropuertos:**
+
+   * **Validación al eliminar un aeropuerto**: No se podrá eliminar un aeropuerto que tenga rutas asociadas. Si un aeropuerto tiene rutas, se debe eliminar primero todas sus rutas (conexiones) antes de poder eliminar el aeropuerto.
+
+4. **Persistencia:**
+
+   * Las operaciones CRUD interactuarán directamente con la base de datos **MySQL**, permitiendo la creación, actualización, y eliminación de registros de aeropuertos y conexiones entre aeropuertos.
+
+5. **Tecnologías a Usar:**
+
+   * **PHP** con **Slim 4**.
+   * **Persistencia**: **MySQL**.
+
+---
+
+#### **Requisitos Técnicos:**
+
+1. **PHP** (versiones recientes).
+2. **Slim 4** para la creación de la API.
+3. **Persistencia en MySQL**.
+4. Uso de **Postman** o **REST Client** para las pruebas de la API.
+
+---
+
+#### **Recomendaciones para la Implementación:**
+
+* **Pruebas**: Realizar pruebas exhaustivas con herramientas como **Postman** o **REST Client** para asegurarse de que todos los endpoints funcionan correctamente.
+* **Seguridad**: Asegúrate de implementar validaciones básicas.
+* **Optimización**: Considera el uso de índices en la base de datos para mejorar la velocidad de las consultas, especialmente cuando trabajas con relaciones entre tablas.

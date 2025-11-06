@@ -1,8 +1,8 @@
+name: "aeropuertos"
 services:
   php:
     image: php:fpm
     build: ./php
-    container_name: aeropuerto_php
     volumes:
       - ./public:/var/www/html
       - ./src:/var/www/src
@@ -17,7 +17,6 @@ services:
 
   nginx:
     image: nginx:latest
-    container_name: aeropuerto_nginx
     ports:
       - "8080:80"
     volumes:
@@ -29,14 +28,14 @@ services:
 
   mysql:
     image: mysql:latest
-    container_name: aeropuerto_mysql
     environment:
       MYSQL_ROOT_PASSWORD: administrador
       MYSQL_USER: alumno
       MYSQL_PASSWORD: alumno
       MYSQL_DATABASE: aeropuerto
     volumes:
-      - ./src/db.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./src/db/create.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./src/db/insert.sql:/docker-entrypoint-initdb.d/init1.sql
       - ./mysql/data:/var/lib/mysql
       # - ./mysql/tmp:/tmp
     ports:

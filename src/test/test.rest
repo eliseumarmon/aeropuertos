@@ -14,19 +14,12 @@ GET http://localhost:8080/aeropuerto/1
 
 ###
 
-POST http://localhost:8080/ciudades
-Content-Type: application/json
-
-{
-    "nombre": "Valencia"
-}
+GET http://localhost:8080/conexiones
 
 ###
 
-POST http://localhost:8080/aeropuertos
-Content-Type: application/json
+GET http://localhost:8080/conexiones/1/5
 
-{
-    "nombre": "Manises",
-    "id_ciudad": 1
-}
+###
+
+GET http://localhost:8080/aeropuerto/3/conexiones
