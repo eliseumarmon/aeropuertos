@@ -1,7 +1,7 @@
 SET NAMES utf8mb4;
 USE aeropuerto;
 -- DATOS: Paises
-INSERT INTO paises (id_pais, nombre) VALUES
+INSERT INTO paises (id_pais, nombre_pais) VALUES
 (1, 'Andorra'),
 (2, 'Albania'),
 (3, 'Austria'),
@@ -53,7 +53,7 @@ INSERT INTO paises (id_pais, nombre) VALUES
 (49, 'Vatican City'),
 (50, 'Kosovo');
 -- DATOS: Ciudades
-INSERT INTO ciudades (id_ciudad, nombre, id_pais) VALUES
+INSERT INTO ciudades (id_ciudad, nombre_ciudad, id_pais) VALUES
 (1, 'Bezmer', 6),
 (2, 'Akureyri', 25),
 (3, 'Egilsstaðir', 25),
@@ -865,7 +865,7 @@ INSERT INTO ciudades (id_ciudad, nombre, id_pais) VALUES
 (809, 'Ufa', 43),
 (810, 'Samara', 43);
 -- DATOS: Aeropuertos
-INSERT INTO aeropuertos (id_aeropuerto, nombre, codigo_iata, id_ciudad) VALUES
+INSERT INTO aeropuertos (id_aeropuerto, nombre_aeropuerto, codigo_iata, id_ciudad) VALUES
 (1, 'Bezmer Air Base', 'JAM', 1),
 (2, 'Akureyri Airport', 'AEY', 2),
 (3, 'Egilsstaðir Airport', 'EGS', 3),

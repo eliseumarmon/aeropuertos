@@ -6,13 +6,13 @@ USE aeropuerto;
 -- 1. Tabla Paises
 CREATE TABLE paises (
     id_pais INT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL
+    nombre_pais VARCHAR(100) NOT NULL
 );
 
 -- 2. Tabla Ciudades
 CREATE TABLE ciudades (
     id_ciudad INT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    nombre_ciudad VARCHAR(100) NOT NULL,
     id_pais INT NOT NULL,
     CONSTRAINT fk_ciudades_paises FOREIGN KEY (id_pais) REFERENCES paises(id_pais)
 );
@@ -20,7 +20,7 @@ CREATE TABLE ciudades (
 -- 3. Tabla Aeropuertos
 CREATE TABLE aeropuertos (
     id_aeropuerto INT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    nombre_aeropuerto VARCHAR(100) NOT NULL,
     codigo_iata VARCHAR(3),
     id_ciudad INT NOT NULL,
     CONSTRAINT fk_aeropuertos_ciudades FOREIGN KEY (id_ciudad) REFERENCES ciudades(id_ciudad)
