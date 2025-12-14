@@ -1,4 +1,5 @@
 # IDE
+/.idea
 .vscode/
 nbproject/
 .DS_STORE
@@ -7,7 +8,6 @@ nbproject/
 src/vendor/
 # Logs
 src/logs/*
-!/logs/README.md
 # Cache
 /var/cache/*
 .phpunit.result.cache
@@ -16,8 +16,9 @@ cache.properties
 # Composer
 composer.phar
 composer.lock
-# mysql container content
-mysql/data
 # .env file
 src/.env
+/docker/*/*.env
+.env
+# Misc
 entregas/
