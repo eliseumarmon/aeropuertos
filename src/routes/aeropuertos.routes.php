@@ -38,3 +38,25 @@ $app->get('/aeropuertos/{id}', function (Request $req, Response $res, array $arg
     $res->getBody()->write(json_encode($aeropuerto));
     return $res->withHeader("Content-Type", "application/json");
 });
+
+$app->get("/aeropuertos/{id}/conexiones/escala", function (Request $req, Response $res, array $args) use ($pdo) {
+    $id = $args["id"];
+
+    $stmt = $pdo->prepare(
+        "SELECT c1.id_origen, ini.nombre_aeropuerto AS Origen, 
+                c2.id_origen AS id_escala, escala.nombre_aeropuerto AS Escala, 
+                c2.id_destino, dest.nombre_aeropuerto AS Destino 
+                FROM conexiones c1 
+                INNER JOIN conexiones c2 ON c1.id_destino = c2.id_origen
+                INNER JOIN aeropuertos ini ON c1.id_origen = ini.id_aeropuerto
+                INNER JOIN aeropuertos escala ON c2.id_origen = escala.id_aeropuerto
+                INNER JOIN aeropuertos dest ON c2.id_destino = dest.id_aeropuerto
+                WHERE c1.id_origen = ? AND c1.id_origen != c2.id_destino;"
+    );
+
+    $stmt->execute([$id]);
+    $rutas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+   
+    $res->getBody()->write(json_encode($rutas));
+    return $res->withStatus(200)->withHeader("Content-Type", "application/json");
+});
