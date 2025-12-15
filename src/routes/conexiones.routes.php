@@ -35,6 +35,24 @@ $app->get("/conexiones/{from}/{to}", function (Request $req, Response $res, arra
     }
 });
 
+$app->get("/conexiones/{id}", function (Request $req, Response $res, array $args) use ($pdo) {
+    $id = $args["id"];
+    $stmt = $pdo->prepare("SELECT ini.id_aeropuerto AS id_origen, ini.nombre_aeropuerto AS nombre_origen,
+                                    dest.id_aeropuerto AS id_destino, dest.nombre_aeropuerto AS nombre_destino
+                                    FROM conexiones 
+                                    INNER JOIN aeropuertos ini ON ini.id_aeropuerto = id_origen
+                                    INNER JOIN aeropuertos dest ON dest.id_aeropuerto = id_destino
+                                    WHERE id_origen = ?;");
+    $stmt->execute([$id]);
+    $conexiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!$conexiones) {
+        $res->getBody()->write(json_encode(["error" => "No se han encontrado destinos."]));
+        return $res->withStatus(404)->withHeader("Content-Type", "application/json");
+    }
+    $res->getBody()->write(json_encode($conexiones));
+    return $res->withStatus(200)->withHeader("Content-Type", "application/json");
+});
+
 $app->get("/conexiones/escala/{from}/{to}", function (Request $req, Response $res, array $args) use ($pdo) {
     $from = $args["from"];
     $to = $args["to"];
@@ -59,7 +77,8 @@ $app->get("/conexiones/escala/{from}/{to}", function (Request $req, Response $re
                 INNER JOIN aeropuertos ini ON c1.id_origen = ini.id_aeropuerto
                 INNER JOIN aeropuertos escala ON c2.id_origen = escala.id_aeropuerto
                 INNER JOIN aeropuertos dest ON c2.id_destino = dest.id_aeropuerto
-                WHERE c1.id_origen = ? AND c2.id_destino = ?;");
+                WHERE c1.id_origen = ? AND c2.id_destino = ?;"
+    );
     $stmt->execute([$from, $to]);
     $rutas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if (!$rutas) {
