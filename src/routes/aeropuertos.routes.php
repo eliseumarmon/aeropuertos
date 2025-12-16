@@ -124,7 +124,7 @@ $app->put("/aeropuertos/{id}", function (Request $req, Response $res, array $arg
     $stmtUpdate = $pdo->prepare("UPDATE aeropuertos SET nombre_aeropuerto = ?, codigo_iata = ?, id_ciudad = ? WHERE id_aeropuerto = ?;");
     $stmtUpdate->execute([$nuevoNombre, $nuevoIata, $nuevoIdCiudad, $idAeropuerto]);
 
-        $result = [
+    $result = [
         "mensaje" => "Aeropuerto modificado correctamente",
         "contenido" => [
             "id_aeropuerto" => $idAeropuerto,
@@ -141,14 +141,24 @@ $app->put("/aeropuertos/{id}", function (Request $req, Response $res, array $arg
 
 $app->delete("/aeropuertos/{id}", function (Request $req, Response $res, array $args) use ($pdo) {
     $idAeropuerto = $args["id"];
-    try {
-        $stmt = $pdo->prepare("DELETE FROM aeropuertos WHERE id_aeropuerto = ?;");
-        $stmt->execute([$idAeropuerto]);
-        // $res->getBody()->write(json_encode(["mensaje" => "Aeropuerto borrado con éxito."])); // Lo ponemos con código 200
-        return $res->withStatus(204); //->withHeader("Content-Type", "application/json");
+    $stmtConexiones = $pdo->prepare("SELECT id_origen, id_destino FROM conexiones 
+                                    WHERE id_origen = ? OR id_destino = ?;");
+    $stmtConexiones->execute([$idAeropuerto, $idAeropuerto]);
+    $conexiones = $stmtConexiones->fetchAll(PDO::FETCH_ASSOC);
+   
+    if (!$conexiones) {
+        try {
+            $stmt = $pdo->prepare("DELETE FROM aeropuertos WHERE id_aeropuerto = ?;");
+            $stmt->execute([$idAeropuerto]);
+            // $res->getBody()->write(json_encode(["mensaje" => "Aeropuerto borrado con éxito."])); // Lo ponemos con código 200
+            return $res->withStatus(204); //->withHeader("Content-Type", "application/json");
 
-    } catch (PDOException $err) {
-        $res->getBody()->write(json_encode(["error" => $err->getMessage()]));
-        return $res->withStatus(500)->withHeader("Content-Type", "application/json");
+        } catch (PDOException $err) {
+            $res->getBody()->write(json_encode(["error" => $err->getMessage()]));
+            return $res->withStatus(500)->withHeader("Content-Type", "application/json");
+        }
     }
+
+    $res->getBody()->write(json_encode(["error" => ["Debes eliminar primero estas conexiones:" => $conexiones]]));
+    return $res->withStatus(400)->withHeader("Content-Type", "application/json");
 });
