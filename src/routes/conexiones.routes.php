@@ -89,3 +89,37 @@ $app->get("/conexiones/escala/{from}/{to}", function (Request $req, Response $re
     return $res->withStatus(200)->withHeader("Content-Type", "application/json");
 });
 
+$app->post("/conexiones", function (Request $req, Response $res, array $args) use ($pdo) {
+    $contents = json_decode($req->getBody(), true);
+    $origen = $contents["id_origen"];
+    $destino = $contents["id_destino"];
+
+    try {
+        $pdo->beginTransaction();
+
+        $stmt_ida = $pdo->prepare("INSERT INTO conexiones (id_origen, id_destino) VALUES (?,?);");
+        $stmt_ida->execute([$origen, $destino]);
+        $stmt_vuelta = $pdo->prepare("INSERT INTO conexiones (id_origen, id_destino) VALUES (?,?);");
+        $stmt_vuelta->execute([$destino, $origen]);
+        $pdo->commit();
+
+        $res->getBody()->write(json_encode(["mensaje" => "Conexión insertada con éxito"]));
+        return $res->withStatus(201)->withHeader("Content-Type", "application/json");
+    } catch (PDOException $err) {
+        $pdo->rollBack();
+        $res->getBody()->write(json_encode(["mensaje" => "Error creando la conexión.", "detalles" => $err->getMessage()]));
+        return $res->withStatus(500)->withHeader("Content-Type", "application/json");
+    }
+});
+
+$app->delete("/conexiones/{id}", function (Request $req, Response $res, array $args) use ($pdo) {
+    $idAeropuerto = $args["id"];
+    try {
+        $stmt = $pdo->prepare("DELETE FROM conexiones WHERE id_destino = ? OR id_origen = ?;");
+        $stmt->execute([$idAeropuerto, $idAeropuerto]);
+        return $res->withStatus(204);
+    } catch (PDOException $err) {
+        $res->getBody()->write(json_encode(["mensaje" => "Error eliminando la conexión."]));
+        return $res->withStatus(500)->withHeader("Content-Type", "application/json");
+    }
+});
