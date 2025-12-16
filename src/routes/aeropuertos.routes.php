@@ -56,7 +56,99 @@ $app->get("/aeropuertos/{id}/conexiones/escala", function (Request $req, Respons
 
     $stmt->execute([$id]);
     $rutas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-   
+
     $res->getBody()->write(json_encode($rutas));
     return $res->withStatus(200)->withHeader("Content-Type", "application/json");
+});
+
+$app->post("/aeropuertos", function (Request $req, Response $res) use ($pdo) {
+    $contents = json_decode($req->getBody(), true);
+    $idAeropuerto = $contents["id_aeropuerto"];
+    $nombreAeropuerto = $contents["nombre_aeropuerto"];
+    $iata = $contents["codigo_iata"];
+    $idCiudad = $contents["id_ciudad"];
+
+    $stmtCiudad = $pdo->prepare("SELECT * FROM ciudades WHERE id_ciudad = ?;");
+    $stmtCiudad->execute([$idCiudad]);
+    $ciudad = $stmtCiudad->fetch(PDO::FETCH_ASSOC);
+
+    if (!$ciudad) {
+        $res->getBody()->write(json_encode(["error" => "La ciudad no existe."]));
+        return $res->withStatus(404)->withHeader("Contet-Type", "application/json");
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO aeropuertos (id_aeropuerto, nombre_aeropuerto, codigo_iata, id_ciudad) VALUES (?,?,?,?);");
+    $stmt->execute([$idAeropuerto, $nombreAeropuerto, $iata, $idCiudad]);
+
+    $result = [
+        "mensaje" => "Aeropuerto creado correctamente",
+        "contenido" => [
+            "id_aeropuerto" => $idAeropuerto,
+            "nombre_aeropuerto" => $nombreAeropuerto,
+            "codigo_iata" => $iata,
+            "id_ciudad" => $idCiudad
+        ]
+    ];
+
+    $res->getBody()->write(json_encode($result));
+    return $res->withStatus(200)->withHeader("Content-Type", "application/json");
+});
+
+$app->put("/aeropuertos/{id}", function (Request $req, Response $res, array $args) use ($pdo) {
+    $idAeropuerto = $args["id"];
+    $contents = json_decode($req->getBody(), true); // Más corto que json_decode($req->getBody(), true)
+
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM aeropuertos WHERE id_aeropuerto = ?;");
+        $stmt->execute([$idAeropuerto]);
+        $original = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $err) {
+        $res->getBody()->write(json_encode(["error" => $err->getMessage()]));
+        return $res->withStatus(500)->withHeader("Content-Type", "application/json");
+    }
+
+    $nuevoNombre = $contents["nombre_aeropuerto"] ?? $original["nombre_aeropuerto"];
+    $nuevoIata = $contents["codigo_iata"] ?? $original["codigo_iata"];
+    $nuevoIdCiudad = $contents["id_ciudad"] ?? $original["id_ciudad"];
+
+    // TODO: getCiudadPorId($id)
+    $stmtCiudad = $pdo->prepare("SELECT * FROM ciudades WHERE id_ciudad = ?;");
+    $stmtCiudad->execute([$nuevoIdCiudad]);
+    $ciudad = $stmtCiudad->fetch(PDO::FETCH_ASSOC);
+
+    if (!$ciudad) {
+        $res->getBody()->write(json_encode(["error" => "La ciudad no existe."]));
+        return $res->withStatus(404)->withHeader("Contet-Type", "application/json");
+    }
+
+    $stmtUpdate = $pdo->prepare("UPDATE aeropuertos SET nombre_aeropuerto = ?, codigo_iata = ?, id_ciudad = ? WHERE id_aeropuerto = ?;");
+    $stmtUpdate->execute([$nuevoNombre, $nuevoIata, $nuevoIdCiudad, $idAeropuerto]);
+
+        $result = [
+        "mensaje" => "Aeropuerto modificado correctamente",
+        "contenido" => [
+            "id_aeropuerto" => $idAeropuerto,
+            "nombre_aeropuerto" => $nuevoNombre,
+            "codigo_iata" => $nuevoIata,
+            "id_ciudad" => $nuevoIdCiudad
+        ]
+    ];
+
+    $res->getBody()->write(json_encode($result));
+    return $res->withStatus(200)->withHeader("Contet-Type", "application/json");
+
+});
+
+$app->delete("/aeropuertos/{id}", function (Request $req, Response $res, array $args) use ($pdo) {
+    $idAeropuerto = $args["id"];
+    try {
+        $stmt = $pdo->prepare("DELETE FROM aeropuertos WHERE id_aeropuerto = ?;");
+        $stmt->execute([$idAeropuerto]);
+        // $res->getBody()->write(json_encode(["mensaje" => "Aeropuerto borrado con éxito."])); // Lo ponemos con código 200
+        return $res->withStatus(204); //->withHeader("Content-Type", "application/json");
+
+    } catch (PDOException $err) {
+        $res->getBody()->write(json_encode(["error" => $err->getMessage()]));
+        return $res->withStatus(500)->withHeader("Content-Type", "application/json");
+    }
 });
